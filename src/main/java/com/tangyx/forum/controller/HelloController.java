@@ -21,8 +21,9 @@ public class HelloController {
         return "index";
     }
 
-    @RequestMapping("/")  // 反斜杠表示 什么都不输入的情况下 就适配这个方法
-    public String showIndex(){
-        return "index";
-    }
+//    @RequestMapping("/")  // 反斜杠表示 什么都不输入的情况下 就适配这个方法
+//    public String showIndex(){
+//        return "index";
+//    }
+
 }

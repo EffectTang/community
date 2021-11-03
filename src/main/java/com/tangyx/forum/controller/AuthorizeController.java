@@ -11,6 +11,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -53,7 +54,11 @@ public class AuthorizeController {
 
         String acesstoken = githubProvider.getAcessToken(accessTokenDTO);
         GithubUser githubUser = githubProvider.getGithubUser(acesstoken);
-        if(githubUser!=null) {
+
+        User is_existence = userMapper.findByAccount(String.valueOf(githubUser.getId()));
+
+//        githubUser!=null&&
+        if(is_existence==null) {
             //将获取到的用户写到数据库中
             User user = new User();
             String token = UUID.randomUUID().toString();
@@ -62,11 +67,13 @@ public class AuthorizeController {
             user.setAccountId(String.valueOf(githubUser.getId()));
             user.setGmtCreate(System.currentTimeMillis());
             user.setGmtModified(user.getGmtCreate());
+            user.setAvatarUrl(githubUser.getAvatar_url());
             userMapper.insertUser(user);
 
             response.addCookie(new Cookie("token",token));
             return "redirect:/";
         }else {
+            response.addCookie(new Cookie("token",is_existence.getToken()));
             return "redirect:/";
         }
 

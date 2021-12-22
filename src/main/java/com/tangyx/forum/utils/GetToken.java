@@ -2,11 +2,13 @@ package com.tangyx.forum.utils;
 
 import com.tangyx.forum.mapper.UserMapper;
 import com.tangyx.forum.model.User;
+import com.tangyx.forum.model.UserExample;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 /**
  * @author tangyx
@@ -28,9 +30,11 @@ public class GetToken {
             for (Cookie cookie:cookies) {
                 if(cookie.getName().equals("token")) {
                     String token = cookie.getValue();
-                     user = userMapper.findByToken(token);
-                    if (user!=null)
-                        request.getSession().setAttribute("user", user);
+                    UserExample userExample = new UserExample();
+                    userExample.createCriteria().andTokenEqualTo(token);
+                     List<User> users= userMapper.selectByExample(userExample);
+                    if (users.size()!=0)
+                        request.getSession().setAttribute("user", users.get(0));
                     break;
                 }
 

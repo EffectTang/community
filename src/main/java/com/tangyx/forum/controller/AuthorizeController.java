@@ -4,6 +4,7 @@ import com.tangyx.forum.dto.AccessTokenDTO;
 import com.tangyx.forum.dto.GithubUser;
 import com.tangyx.forum.mapper.UserMapper;
 import com.tangyx.forum.model.User;
+import com.tangyx.forum.model.UserExample;
 import com.tangyx.forum.provider.GithubProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -11,10 +12,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import javax.servlet.ServletOutputStream;
 import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -54,13 +54,17 @@ public class AuthorizeController {
 
         String acesstoken = githubProvider.getAcessToken(accessTokenDTO);
         GithubUser githubUser = githubProvider.getGithubUser(acesstoken);
+        UserExample userExample = new UserExample();
+        userExample.createCriteria().
+                andAccountIdEqualTo(String.valueOf(githubUser.getId()));
+        List<User> is_existence = userMapper.selectByExample(userExample);
+//                userMapper.findByAccount(String.valueOf(githubUser.getId()));
 
-        User is_existence = userMapper.findByAccount(String.valueOf(githubUser.getId()));
 
 //        githubUser!=null&&
-        if(is_existence==null) {
-            //将获取到的用户写到数据库中
+        if(is_existence.size()==0) {
             User user = new User();
+            //将获取到的用户写到数据库中
             String token = UUID.randomUUID().toString();
             user.setToken(token);
             user.setName(githubUser.getName());
@@ -68,12 +72,27 @@ public class AuthorizeController {
             user.setGmtCreate(System.currentTimeMillis());
             user.setGmtModified(user.getGmtCreate());
             user.setAvatarUrl(githubUser.getAvatar_url());
-            userMapper.insertUser(user);
+            userMapper.insert(user);
 
             response.addCookie(new Cookie("token",token));
             return "redirect:/";
         }else {
-            response.addCookie(new Cookie("token",is_existence.getToken()));
+            String token = UUID.randomUUID().toString();
+            User user = is_existence.get(0);
+
+            User mgbuser =new User();
+            mgbuser.setToken(token);
+            mgbuser.setGmtModified(System.currentTimeMillis());
+            mgbuser.setName(githubUser.getName());
+            mgbuser.setAvatarUrl(githubUser.getAvatar_url());
+
+            UserExample userExample1 = new UserExample();
+            userExample1.createCriteria().andIdEqualTo(user.getId());
+
+            userMapper.updateByExampleSelective(mgbuser,userExample1);
+
+//            userMapper.updateUser(is_existence); 被mbg替代 猜测不传参 表示所有
+            response.addCookie(new Cookie("token",mgbuser.getToken()));
             return "redirect:/";
         }
 

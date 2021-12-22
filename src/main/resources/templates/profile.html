@@ -1,32 +1,26 @@
-<!DOCTYPE HTML>
+<!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" >
 <head>
-    <title>学海无涯</title>
+    <meta charset="UTF-8">
+    <title th:text="${sectionName}"></title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <link rel="stylesheet" href="css/bootstrap.min.css">
-    <link rel="stylesheet" href="css/bootstrap-theme.min.css">
-    <link rel="stylesheet" href="css/forum.css">
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/bootstrap-theme.min.css">
+    <link rel="stylesheet" href="/css/forum.css">
 
-    <script src="js/jquery-3.6.0.min.js" ></script>
-    <script src="js/bootstrap.min.js" type="application/javascript"></script>
+    <script src="/js/jquery-3.6.0.min.js" ></script>
+    <script src="/js/bootstrap.min.js" type="application/javascript"></script>
+
 </head>
-<script type="application/javascript">
-    window.onload = function () {
-        var ifclose = localStorage.getItem("closeable");
-        if(ifclose === "true"){
-            window.close()
-            window.localStorage.removeItem("closeable")
-        }
-    }
-</script>
 <body>
     <div th:include="navigation :: nav"></div>
 
     <div class="container-fluid main">
         <div class="row">
             <div class="col-lg-9 col-md-12 .col-xs-12 .col-sm-12" >
-                <h2><span class="glyphicon glyphicon-list" aria-hidden="true"></span>发现</h2>
-                <div class="media" th:each="questionlist : ${pagesdto.questionsdto}">
+                <h2><span th:text="${sectionName}" class="glyphicon glyphicon-list" aria-hidden="true"></span></h2>
+
+                <div class="media" th:each="questionlist : ${userpages.questionsdto}">
                     <div class="media-left">
                         <a href="#">
                             <img class="media-object" style="width: 65px"
@@ -34,10 +28,7 @@
                         </a>
                     </div>
                     <div class="media-body">
-                        <h4  >
-                           <a  th:text="${questionlist.title}" th:href="@{'/question/'+${questionlist.getId()}}"></a>
-                        </h4>
-
+                        <h4 class="media-heading" th:text="${questionlist.title}"></h4>
                         <span th:text="${questionlist.description}"></span>
                         <ol class="breadcrumb" style="background-color: #fff8dc">
                             <li><a href="#">回复 <span th:text="${questionlist.commentCount}"></span></a></li>
@@ -49,39 +40,47 @@
 
                 <nav aria-label="Page navigation" class="navbar-right">
                     <ul class="pagination">
-                        <li th:if="${pagesdto.isFirstPage()}">
-                            <a th:href="@{/(page=1)}" aria-label="Previous">
+                        <li th:if="${userpages.isFirstPage()}">
+                            <a th:href="@{'/profile/'+${section}(page=1)}" aria-label="Previous">
                                 <span aria-hidden="true">&lt;&lt;</span>
                             </a>
                         </li>
-                        <li th:if="${pagesdto.isPre()}">
-                            <a th:href="@{/(page=${pagesdto.currentPage -1})}" aria-label="Previous">
+                        <li th:if="${userpages.isPre()}">
+                            <a th:href="@{'/profile/'+${section}(page=${userpages.currentPage -1})}" aria-label="Previous">
                                 <span aria-hidden="true">&lt;</span>
                             </a>
                         </li>
 
-                        <li th:each="page : ${pagesdto.pages}"
-                            th:class="${pagesdto.currentPage==page}?'active' :'' ">
-                            <a th:href="@{/(page=${page})}" th:text="${page}"></a>
+                        <li th:each="page : ${userpages.pages}"
+                            th:class="${userpages.currentPage==page}?'active' :'' ">
+                            <a th:href="@{'/profile/'+${section}(page=${page})}" th:text="${page}"></a>
                         </li>
-                        <li th:if="${pagesdto.isNext()}">
-                            <a th:href="@{/(page=${pagesdto.currentPage + 1})}" aria-label="Next">
+                        <li th:if="${userpages.isNext()}">
+                            <a th:href="@{'/profile/'+${section}(page=${userpages.currentPage + 1})}"
+
+                               aria-label="Next">
                                 <span aria-hidden="true">&gt; </span>
                             </a>
                         </li>
-                        <li th:if="${pagesdto.isEndPage()}">
-                            <a th:href="@{/(page=${pagesdto.totalPage})}" aria-label="Next">
+                        <li th:if="${userpages.isEndPage()}">
+                            <a th:href="@{'/profile/'+${section}(page=${userpages.totalPage})}" aria-label="Next">
                                 <span aria-hidden="true">&gt;&gt;</span>
                             </a>
                         </li>
                     </ul>
                 </nav>
+
             </div>
             <div class="col-lg-3 col-md-12 .col-xs-12 .col-sm-12" >
-                <h2>热门话题</h2>
-                • 问题标题: 请用精简的语言描述您发布的问题，不超过25字<br/>
-                • 问题补充: 详细补充您的问题内容，并确保问题描述清晰直观, 并提供一些相关的资料<br/>
-
+                <div class="list-group section">
+                    <a href="/profile/questions"
+                       th:class="${section=='questions'} ? 'list-group-item active' :'list-group-item' ">
+                        我的问题
+                    </a>
+                    <a href="/profile/replies"
+                       th:class="${section=='replies'} ? 'list-group-item active' :'list-group-item' ">
+                        我的回答</a>
+                </div>
             </div>
         </div>
         <div class="row">

@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" >
+<head>
+    <meta charset="UTF-8">
+    <title >error</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/bootstrap-theme.min.css">
+    <link rel="stylesheet" href="/css/forum.css">
+
+    <script src="/js/jquery-3.6.0.min.js" ></script>
+    <script src="/js/bootstrap.min.js" type="application/javascript"></script>
+
+</head>
+<body>
+<div th:include="navigation :: nav"></div>
+
+<div class="container-fluid main">
+    <div class="row">
+        <div class="jumbotron">
+            <h1>不好意思，网页跑丢了</h1>
+            <p th:text="${message}">稍后再看看</p>
+            <p><a class="btn btn-primary btn-lg" href="/" role="button">回到首页</a></p>
+        </div>
+    </div>
+
+</div>
+</body>
+</html>

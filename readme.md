@@ -7,3 +7,6 @@ spring
 git 
 IDEA
 github
+
+mvn flyway:migrate
+mvn -Dmybatis.generator.overwrite=true mybatis-generator:generate
